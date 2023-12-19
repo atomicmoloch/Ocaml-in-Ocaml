@@ -1,0 +1,33 @@
+
+** Conflict (shift/reduce) in state 127.
+** Token involved: Pipe
+** This state is reached from start after reading:
+
+Let Id list(param) Eq Match expr With Pipe Id DoubleArrow Match expr With Pipe match_branch
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+start 
+program EOF 
+binding DoubleSemicolon program 
+Let Id list(param) Eq expr 
+                      Match expr With Pipe separated_nonempty_list(Pipe,match_branch) 
+                                           (?)
+
+** In state 127, looking ahead at Pipe, reducing production
+** separated_nonempty_list(Pipe,match_branch) -> match_branch
+** is permitted because of the following sub-derivation:
+
+match_branch Pipe separated_nonempty_list(Pipe,match_branch) // lookahead token appears
+Id DoubleArrow expr // lookahead token is inherited
+               Match expr With Pipe separated_nonempty_list(Pipe,match_branch) // lookahead token is inherited
+                                    match_branch . 
+
+** In state 127, looking ahead at Pipe, shifting is permitted
+** because of the following sub-derivation:
+
+match_branch 
+Id DoubleArrow expr 
+               Match expr With Pipe separated_nonempty_list(Pipe,match_branch) 
+                                    match_branch . Pipe separated_nonempty_list(Pipe,match_branch) 
